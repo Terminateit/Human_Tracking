@@ -27,3 +27,8 @@ python3 yolov3_video.py
 
 Also, you can assess the quality of the algorithm watching the video in folder "output".
 
+ If you have some troubles with OpenCV, try to do:
+
+```bash
+pip3 install opencv-python==4.2.0.32 && pip3 install opencv-contrib-python==4.2.0.32
+```
