@@ -10,11 +10,18 @@ import os
 
 ###-----------------------------------------------------### For tracking
 def calc_dist(coord_new_frame, coord_prev_frame):
+	# The function that calculates the eucledean distance 
+	# between two points (x_new, y_new) and (x_prev, y_prev)
+	# It returns the float number
 	coord_subtract = np.subtract(coord_new_frame, coord_prev_frame)
 	dist = np.sqrt(coord_subtract[0]**2+coord_subtract[1]**2)
 	return int(dist)
 
 def draw_box_rectangle(frame, box, color, id):
+	# The function just draws rectangle by given coordinates of the box
+	# on the certain frame.
+	# Also, it gives rectangle certain color and ID (text)
+
 	# extract the bounding box coordinates
 	# box = (x, y, w, h, centerx, centery)
 	(x, y) = (box[0], box[1])
@@ -29,18 +36,33 @@ def draw_box_rectangle(frame, box, color, id):
 		cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 2)
 	return frame
 
-track_dictionary = {}
+track_dictionary = {} # dict for saving info about people being tracked
+# key: id. value: x, y, w, h, centerx, centery, color
+# where:
+## id - id of the human
+## x - x coordinate on the frame of the left upper angle of the human rectangle
+## y - y coordinate on the frame of the left upper angle of the human rectangle
+## (centerx, centery) - coordinates of the rectangle's center.
+## color - color of the rectangle. (r,g,b)
 
 def track_human(boxes, track_dictionary):
+	# function that starts every new frame shows
+	# input: boxes of detected by YOLO people and dictionary that saves info about people that have been tracked already
 	# box = (x, y, w, h, centerx, centery, color)
-	idx_in_this_frame = []
+	# output: ids of people to show in this frame and updated dictionary of tracked people if there were new people.
+
+	idx_in_this_frame = [] #This list saves human detected on this frame in order to show them later on this frame
 	if track_dictionary == {}:
+		# is dictionary is free, than that's probably the first frame and there weren't any people that were tracked earlier 
 		for box in boxes:
 			track_dictionary[i] = box
 			idx_in_this_frame.append(boxes.index(box))	
+
 	else:
 		for box in boxes:
-			min_dist = 5000
+			# try to find people that were seen in the previous frames in order to set the same id for them.
+
+			min_dist = 5000 # ratio in order to compare people from dictionary with people in the boxes.
 			for key, value in track_dictionary.copy().items():
 				dist = calc_dist(box[4:6], track_dictionary[key][4:6])
 				if dist <= min_dist:
